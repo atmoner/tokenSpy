@@ -1,0 +1,137 @@
+ 
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TokenSpy</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+        <script src="js/jquery-3.4.1.min.js"></script>
+        <link rel="stylesheet" href="css/uikit.min.css" />
+        <script src="js/uikit.min.js"></script>
+        <script src="js/uikit-icons.min.js"></script>
+
+
+    </head>
+
+    <body>
+<br />
+<div class="uk-container">
+<div align="center"><img src="logo.png" width="60" height="60"> </div> <br />
+<div class="uk-child-width-expand@s " uk-grid>
+    <div>
+        <div class="uk-card uk-card-default uk-card-body">
+		 <div id="instagramDetected"></div><br /><br />
+		 <button class="uk-button uk-button-primary" id="insta"> <span class="uk-margin-small-right" uk-icon="instagram"></span> Dump</button> 
+		<div id="instaInjectButton" style="display: none;">
+			<button class="uk-button uk-button-primary" id="instaInject"> 
+				<span class="uk-margin-small-right" uk-icon="instagram"></span> Inject login</button>
+			<button id="optionButonInsta" class="uk-button uk-button-default" type="button"><span class="uk-margin-small-right" uk-icon="more-vertical"></span></button>
+			<div id="optionMenuInsta" uk-dropdown>
+				<ul class="uk-nav uk-dropdown-nav">
+				    <li class="uk-nav-header">Token options</li>
+				    <li><a href="#">Voir le token</a></li>
+				    <li><a href="#">Editer le token</a></li>
+				    <li class="uk-nav-divider"></li>
+				    <li><a href="#">Effacer le token</a></li>
+				</ul>
+			</div>  
+		</div>
+		<!-- <div id="instaDump"></div> -->
+ 
+
+		</div>
+
+    </div>
+    <div>
+        <div class="uk-card uk-card-default uk-card-body">
+		<div id="twitterDetected"></div><br /><br />
+		<button class="uk-button uk-button-primary" id="twitter"> <span class="uk-margin-small-right" uk-icon="twitter"></span> Dump</button> 
+		<div id="twitterInjectButton" style="display: none;">
+			<button class="uk-button uk-button-primary" id="twitterInject"> 
+				<span class="uk-margin-small-right" uk-icon="twitter"></span> Inject login</button>
+			<button id="optionButonTwitter" class="uk-button uk-button-default" type="button"><span class="uk-margin-small-right" uk-icon="more-vertical"></span></button>
+			<div id="optionMenuTwitter" uk-dropdown>
+				<ul class="uk-nav uk-dropdown-nav">
+				    <li class="uk-nav-header">Token options</li>
+				    <li><a href="#">Voir le token</a></li>
+				    <li><a href="#">Editer le token</a></li>
+				    <li class="uk-nav-divider"></li>
+				    <li><a href="#">Effacer le token</a></li>
+				</ul>
+			</div>
+		</div>
+		<!-- <div id="twitterDump"></div>	 -->
+
+		</div>
+ 
+    </div>
+    <div>
+        <div class="uk-card uk-card-default uk-card-body">
+		  <div id="githubDetected"></div><br /><br />
+		 <button class="uk-button uk-button-primary" id="github"> <span class="uk-margin-small-right" uk-icon="github"></span> Dump</button> 
+		<div id="githubInjectButton" style="display: none;">
+			<button class="uk-button uk-button-primary" id="githubInject"> 
+				<span class="uk-margin-small-right" uk-icon="github"></span> Inject login</button>
+			<button id="optionButonGithub" class="uk-button uk-button-default" type="button"><span class="uk-margin-small-right" uk-icon="more-vertical"></span></button>
+			<div id="optionMenuGithub" uk-dropdown>
+				<ul class="uk-nav uk-dropdown-nav">
+				    <li class="uk-nav-header">Token options</li>
+				    <li><a href="#">Voir le token</a></li>
+				    <li><a href="#">Editer le token</a></li>
+				    <li class="uk-nav-divider"></li>
+				    <li><a href="#">Effacer le token</a></li>
+				</ul>
+			</div>
+		</div>
+		<!-- <div id="githubDump"></div> -->			
+		</div>
+ 
+    </div>
+
+    <div>
+        <div class="uk-card uk-card-default uk-card-body">
+		  <div id="deleteReturn"></div>
+		 <button class="uk-button uk-button-primary" id="deleteSessionLocal">Effacer les sessions</button>			
+		</div>
+    </div>
+
+    <div>
+        <div class="uk-card uk-card-default uk-card-body">
+		  <div id="deleteMoz_cookiesReturn"></div>
+		 <button class="uk-button uk-button-primary" id="deleteMoz_cookies">Effacer moz_cookies</button>			
+		</div>
+    </div>
+</div>
+		  <div id="returnDebug"></div><br /><br />
+		 <button class="uk-button uk-button-primary" id="displayDebug">Afficher le debug()</button>			
+</div>
+    <!-- <div id="container"></div> -->
+
+
+<div id="modal-group-1" uk-modal>
+    <div class="uk-modal-dialog">
+ 
+        <div class="uk-modal-header">
+            <h2 class="uk-modal-title"><img src="logo.png" width="30" height="30"> Master password</h2>
+        </div>
+        <div class="uk-modal-body">
+            
+			<form  action="">
+				<fieldset class="uk-fieldset">
+					<div class="uk-margin">
+						<input class="uk-input" type="password" value="123456789123456789" id="pass"> <!-- placeholder="Votre password" -->
+					</div>
+					<p>Ce password chiffre vos donnée stockées, il vous sera demander à chaque lancement du programme! </p>
+				</fieldset>
+			</form>
+			
+        </div>
+        <div class="uk-modal-footer uk-text-right"> 
+			<button class="uk-button uk-button-primary" id="addPass">Ajouter</button>
+        </div>
+    </div>
+</div>
+     <script src="./renderer.js"> </script>
+    </body>
+</html>
