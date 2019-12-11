@@ -1,6 +1,7 @@
-// electron-packager . --asar
+// electron-packager . --asar --overwrite
 var $ = require("jquery");
 var sq = require('sqlite3');
+var fs = require('fs');
 const Store = require('electron-store');
 const store = new Store();
 sq.verbose(); 
@@ -8,21 +9,46 @@ if (store.get('masterPass')) {
 	var encryptor = require('simple-encryptor')(store.get('masterPass'));
 }
 let user = process.env.USER || "";
-let platform = process.platform;
 var pathMoz = "";
 
-console.log(process.env.HOME);
+// Get path moz
+function get_line(filename, line_no, callback) {
+    var data = fs.readFileSync(filename, 'utf8');
+    var lines = data.split("\n");
 
-if(platform == "linux") {
-	pathMoz = '/home/'+user+'/.mozilla/firefox/profiles.ini';
-} else if (platform == "win32" || platform == "win64") {
-	pathMoz = 'C:\Users\<user>\AppData\Local\Mozilla\Firefox\profiles.ini';
-} else if (opsys == "darwin") {
-	pathMoz = '';
+    if(+line_no > lines.length){
+      throw new Error('File end reached without finding line');
+    }
+
+    callback(null, lines[+line_no]);
 }
+function getUserHome() {
+	return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+}
+console.log();
+// Cross-platform 
+if(process.platform == "linux") {
+	get_line('/home/'+user+'/.mozilla/firefox/profiles.ini', 1, function(err, line){
+		defaulPath = line.replace('Default=Profiles/','');		
+	  })
+	pathMoz = '/home/'+user+'/.mozilla/firefox/'+defaulPath+'/cookies.sqlite';
+
+} else if (process.platform == "win32" || process.platform == "win64") {
+	var getUser = getUserHome();
+	get_line(getUser + '\\AppData\\Roaming\\Mozilla\\Firefox\\profiles.ini', 1, function(err, line){
+		defaulPath = line.replace('Default=Profiles/','');		
+		defaulPathSan = defaulPath.replace(/\s/g, '');
+	  })
+	pathMoz = getUser + '\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\'+defaulPathSan+'\\cookies.sqlite';
+
+} /* else if (opsys == "darwin") {
+	pathMoz = '';
+} */
+console.log(pathMoz);
 // TODO 1/ Trouver le dossier utilisateur mozzila
 // TODO 2/ Faire un Cross Plateforme, motherfucker!
-var db = new sq.Database('/home/atmo/.mozilla/firefox/zpbmz7ql.default-release/cookies.sqlite');
+// var db = new sq.Database('/home/atmo/.mozilla/firefox/zpbmz7ql.default-release/cookies.sqlite');
+var db = new sq.Database(pathMoz);
  
 
 $("#displayDebug").click(function(e){
