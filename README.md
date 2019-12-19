@@ -1,5 +1,7 @@
 # tokenSpy
 
+![](https://i.imgur.com/tXAdLGm.png)
+
 Install from sources:
 ```bash
 git clone https://github.com/atmoner/tokenSpy.git && cd tokenSpy/
@@ -14,8 +16,6 @@ electron-packager .
 ```
 
 Or download precompiled exe:
-Linux: tokenSpy-linux-x64.zip
-Windows: tokenSpy-win32-x64.zip
 
 | Item      | Value |
 | --------- | -----|
