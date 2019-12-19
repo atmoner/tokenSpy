@@ -1,17 +1,38 @@
 const { app, BrowserWindow, Menu } = require('electron')
+var sq = require('sqlite3');
+var fs = require('fs');
+var basepath = app.getAppPath();
+
+// Definit le stockage des donnée dans le dossier du programme
+app.setPath ('userData', basepath + '/store');
+const userDataPath = app.getPath ('userData');
 const Store = require('electron-store');
 const store = new Store();
-
+//console.log(store.delete('masterPass'));
 // Gardez une reference globale de l'objet window, si vous ne le faites pas, la fenetre sera
 // fermee automatiquement quand l'objet JavaScript sera garbage collected.
 let win
+let user = process.env.USER || "";
+var pathMoz = "";
+
+// Get path moz
+function get_line(filename, line_no, callback) {
+    var data = fs.readFileSync(filename, 'utf8');
+    var lines = data.split("\n");
+
+    if(+line_no > lines.length){
+      throw new Error('File end reached without finding line');
+    }
+
+    callback(null, lines[+line_no]);
+}
 
 function createWindow () {
   // Créer le browser window.
   win = new BrowserWindow({
-    width: 400,
-    height: 600,
-	icon: 'logo2.png',
+    width: 420,
+    height: 650,
+	icon: 'logo.png',
     webPreferences: {
       nodeIntegration: true
     }
@@ -21,26 +42,49 @@ function createWindow () {
   win.loadFile('index.html')
 
   // Ouvre les DevTools.
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
 
   // Émit lorsque la fenêtre est fermée.
   win.on('closed', () => {
     // Dé-référence l'objet window , normalement, vous stockeriez les fenêtres
     // dans un tableau si votre application supporte le multi-fenêtre. C'est le moment
     // où vous devez supprimer l'élément correspondant.
+	store.delete('masterPass');
     win = null
   })
 
   // Other code removed for brevity
 
+	// Cross-platform 
+	if(process.platform == "linux") {
+		get_line('/home/'+user+'/.mozilla/firefox/profiles.ini', 1, function(err, line){
+			defaulPath = line.replace('Default=','');		
+		  })
+		pathMoz = '/home/'+user+'/.mozilla/firefox/'+defaulPath+'/cookies.sqlite';
+
+	} else if (process.platform == "win32" || process.platform == "win64") {
+		var getUser = getUserHome();
+		get_line(getUser + '\\AppData\\Roaming\\Mozilla\\Firefox\\profiles.ini', 1, function(err, line){
+			defaulPath = line.replace('Default=Profiles/','');		
+			defaulPathSan = defaulPath.replace(/\s/g, '');
+		  })
+		pathMoz = getUser + '\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\'+defaulPathSan+'\\cookies.sqlite';
+
+	}
+	var db = new sq.Database(pathMoz);
+  // Menu
   var menu = Menu.buildFromTemplate([
       {
           label: 'Menu',
           submenu: [
-              {label:'Ouvrir un fichier'},
-              {label:'A!de',
+              {label:'Github',
 		            click() {  
-						require("electron").shell.openExternal("https://www.w3schools.com");
+						require("electron").shell.openExternal("https://github.com/atmoner/tokenSpy");
+		            } 
+				},
+              {label:'Report issue',
+		            click() {  
+						require("electron").shell.openExternal("https://github.com/atmoner/tokenSpy/issues");
 		            } 
 				},
               {label:'Quitter', 
@@ -48,7 +92,25 @@ function createWindow () {
 		                app.quit() 
 		            } 
 				}
-          ]
+          ],
+      },
+      {
+          label: 'Action',
+          submenu: [
+              {label:'Delete local token',
+		            click() {  
+						store.delete('instaSessions');
+						store.delete('twitterSessions');
+						store.delete('githubSessions');
+						store.delete('masterPass');
+		            } 
+				},
+              {label:'Delete mozilla cookies',
+		            click() {  
+						db.run("DELETE FROM moz_cookies;");
+		            } 
+				}
+          ],
       }
   ])
   Menu.setApplicationMenu(menu); 

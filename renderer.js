@@ -1,3 +1,4 @@
+// Compile from source:
 // electron-packager . --asar --overwrite
 var $ = require("jquery");
 var sq = require('sqlite3');
@@ -8,6 +9,7 @@ sq.verbose();
 if (store.get('masterPass')) { 
 	var encryptor = require('simple-encryptor')(store.get('masterPass'));
 }
+let platform = process.platform;
 let user = process.env.USER || "";
 var pathMoz = "";
 
@@ -25,11 +27,11 @@ function get_line(filename, line_no, callback) {
 function getUserHome() {
 	return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 }
-console.log();
+
 // Cross-platform 
 if(process.platform == "linux") {
 	get_line('/home/'+user+'/.mozilla/firefox/profiles.ini', 1, function(err, line){
-		defaulPath = line.replace('Default=Profiles/','');		
+		defaulPath = line.replace('Default=','');		
 	  })
 	pathMoz = '/home/'+user+'/.mozilla/firefox/'+defaulPath+'/cookies.sqlite';
 
@@ -44,10 +46,7 @@ if(process.platform == "linux") {
 } /* else if (opsys == "darwin") {
 	pathMoz = '';
 } */
-console.log(pathMoz);
-// TODO 1/ Trouver le dossier utilisateur mozzila
-// TODO 2/ Faire un Cross Plateforme, motherfucker!
-// var db = new sq.Database('/home/atmo/.mozilla/firefox/zpbmz7ql.default-release/cookies.sqlite');
+ 
 var db = new sq.Database(pathMoz);
  
 
@@ -62,40 +61,28 @@ $("#displayDebug").click(function(e){
 });
 
 $("#instaInject").click(function(){
-console.log('go sql');
+
  	r = encryptor.decrypt(store.get('instaSessions'));
 	
 	db.run("INSERT INTO moz_cookies (baseDomain, creationTime, expiry, host, inBrowserElement, isHttpOnly, isSecure, lastAccessed, name, originAttributes, path, rawSameSite, sameSite, value) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [r[0].baseDomain, r[0].creationTime, r[0].expiry, r[0].host, r[0].inBrowserElement, r[0].isHttpOnly, r[0].isSecure, r[0].lastAccessed, r[0].name, r[0].originAttributes, r[0].path, r[0].rawSameSite, r[0].sameSite, r[0].value]);
 });
 
 $("#twitterInject").click(function(){
-console.log('go sql');
+
  	r = encryptor.decrypt(store.get('twitterSessions'));
 	
 	db.run("INSERT INTO moz_cookies (baseDomain, creationTime, expiry, host, inBrowserElement, isHttpOnly, isSecure, lastAccessed, name, originAttributes, path, rawSameSite, sameSite, value) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [r[0].baseDomain, r[0].creationTime, r[0].expiry, r[0].host, r[0].inBrowserElement, r[0].isHttpOnly, r[0].isSecure, r[0].lastAccessed, r[0].name, r[0].originAttributes, r[0].path, r[0].rawSameSite, r[0].sameSite, r[0].value]);
+
+	$("#twitterSucces").show();
 });
 
 $("#githubInject").click(function(){
-console.log('go sql');
+
  	r = encryptor.decrypt(store.get('githubSessions'));
 	
 	db.run("INSERT INTO moz_cookies (baseDomain, creationTime, expiry, host, inBrowserElement, isHttpOnly, isSecure, lastAccessed, name, originAttributes, path, rawSameSite, sameSite, value) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [r[0].baseDomain, r[0].creationTime, r[0].expiry, r[0].host, r[0].inBrowserElement, r[0].isHttpOnly, r[0].isSecure, r[0].lastAccessed, r[0].name, r[0].originAttributes, r[0].path, r[0].rawSameSite, r[0].sameSite, r[0].value]);
 }); 
-if (!store.get('masterPass')) {
-	$(function() {
-		var modal = UIkit.modal("#modal-group-1",{'bgClose':false});
-		modal.show(); 
-	});
-	$("#addPass").click(function(e){
-		store.set('masterPass',$('#pass').val());
-		console.log($('#pass').val());
- 
-     $(this).attr('disabled',true);
-     $("#addPass").text('Master pass ajouté!');
-	 location.reload();
- 
-	});
-}
+
 
 $("#deleteSessionLocal").click(function(e){
 	store.delete('instaSessions');
@@ -117,8 +104,7 @@ $("#insta").click(function(e){
 			throw err;
 		}
 		var objEnc = encryptor.encrypt(rows);
-		 // Store session
- 		 store.set('instaSessions', objEnc);
+        store.set('instaSessions', objEnc);
 	 	$("#instaDump").replaceWith('<span class="uk-text-success"><span class="uk-margin-small-right" uk-icon="check"></span> Dump OK!</span>');
 		$(this).attr('disabled',true);
 
@@ -135,12 +121,11 @@ $("#twitter").click(function(e){
 			throw err;
 		}
 		var objEnc = encryptor.encrypt(rows);
-		store.set('twitterSessions', objEnc); // Store session
+		store.set('twitterSessions', objEnc); 
 	 	$("#twitterDump").replaceWith('<span class="uk-text-success"><span class="uk-margin-small-right" uk-icon="check"></span> Dump OK!</span>');
 		$(this).attr('disabled',true);
-
-		$("#twitterInjectButton").show();
 		$("#twitter").hide();
+		$("#twitterInjectButton").show();
 	});
 });
 
@@ -152,7 +137,7 @@ $("#github").click(function(e){
 			throw err;
 		}
 		var objEnc = encryptor.encrypt(rows);
-		store.set('githubSessions', objEnc); // Store session
+		store.set('githubSessions', objEnc); 
 	 	$("#githubDump").replaceWith('<span class="uk-text-success"><span class="uk-margin-small-right" uk-icon="check"></span> Dump OK!</span>');
 		$(this).attr('disabled',true);
 
@@ -161,66 +146,126 @@ $("#github").click(function(e){
 	});
 });
 
+function startUp() {
+ 
 
-let instagramExist = `SELECT baseDomain FROM moz_cookies WHERE baseDomain='instagram.com' AND name = 'sessionid';`;
-db.all(instagramExist, [], (err, rows) => {
+	let instagramExist = `SELECT baseDomain FROM moz_cookies WHERE baseDomain='instagram.com' AND name = 'sessionid';`;
+	db.all(instagramExist, [], (err, rows) => {
 
-	if (err) {
-		throw err;
-	} 
-	if (rows != '') {
-		$("#instagramDetected").replaceWith('<span class="uk-text-success"><span class="uk-margin-small-right" uk-icon="check"></span> Instagram login detecté</span>');
+		if (err) {
+			throw err;
+		} 
+		if (rows != '') {
+			$("#instagramDetected").replaceWith('<span class="uk-text-success"><span class="uk-margin-small-right" uk-icon="check"></span> Instagram login detecté</span>');
+		} else {
+			$("#instagramDetected").replaceWith('<span class="uk-text-danger"><span class="uk-margin-small-right" uk-icon="close"></span> Aucun login detecté</span>');
+			$('#insta').attr('disabled','disabled');
+			$( "#optionButonInsta" ).remove();
+			$( "#optionMenuInsta" ).remove();
+			}	
+			if (store.get('instaSessions')) {
+				$("#instaInjectButton").show();
+				$("#insta").hide();			
+			}
+
+	});
+
+	let twitterExist = `SELECT baseDomain FROM moz_cookies WHERE baseDomain='twitter.com' AND name = 'auth_token';`;
+	db.all(twitterExist, [], (err, rows) => {
+
+		if (err) {
+			throw err;
+		}  
+		if (rows != '') {
+			$("#twitterDetected").replaceWith('<span class="uk-text-success"><span class="uk-margin-small-right" uk-icon="check"></span> Twitter login detecté</span>');
+		} else {
+			$("#twitterDetected").replaceWith('<span class="uk-text-danger"><span class="uk-margin-small-right" uk-icon="close"></span> Aucun login detecté</span>');
+			$('#twitter').attr('disabled','disabled');
+			$( "#optionButonTwitter" ).remove();
+			$( "#optionMenuTwitter" ).remove();
+			}
+			if (store.get('twitterSessions')) {
+				$("#twitterInjectButton").show();
+				$("#twitter").hide();			
+			}
+	});
+
+	let githubExist = `SELECT baseDomain FROM moz_cookies WHERE baseDomain='github.com' AND name = 'user_session';`;
+	db.all(githubExist, [], (err, rows) => {
+
+		if (err) {
+			throw err;
+		}  
+		if (rows != '') {
+			$("#githubDetected").replaceWith('<span class="uk-text-success"><span class="uk-margin-small-right" uk-icon="check"></span> Github login detecté</span>');
+		} else {	
+			$("#githubDetected").replaceWith('<span class="uk-text-danger"><span class="uk-margin-small-right" uk-icon="close"></span> Aucun login detecté</span>');
+			$('#github').attr('disabled','disabled');
+			$( "#optionButonGithub" ).remove();
+			$( "#optionMenuGithub" ).remove();
+			}
+			if (store.get('githubSessions')) {
+				$("#githubInjectButton").show();
+				$("#github").hide();			
+			}
+
+	});
+}
+function smallPb() {
+	$(function() {
+		var modal = UIkit.modal("#errorMoz",{'bgClose':false});
+		$( "#all" ).remove();
+		modal.show(); 
+	});
+}
+
+const exec = require('child_process').exec;
+
+const isRunning = (query, cb) => {
+
+    let cmd = '';
+    switch (platform) {
+        case 'win32' : cmd = `tasklist`; break;
+        case 'darwin' : cmd = `ps -ax | grep ${query}`; break;
+        case 'linux' : cmd = `ps -A`; break;
+        default: break;
+    }
+    exec(cmd, (err, stdout, stderr) => {
+        cb(stdout.toLowerCase().indexOf(query.toLowerCase()) > -1);
+    });
+}
+function runMasterPass() {
+	if (!store.get('masterPass')) {
+		$(function() {
+			var modal = UIkit.modal("#masterPass",{'bgClose':false});
+			modal.show(); 
+		});
+		$("#addPass").click(function(e){
+			store.set('masterPass',$('#pass').val());
+			console.log($('#pass').val());
+	 
+		 $(this).attr('disabled',true);
+		 $("#addPass").text('Master pass ajouté!');
+		 location.reload();
+	 
+		});
+	}
+}
+
+switch (platform) {
+    case 'win32' : moz_name = `firefox.exe`; break;
+    case 'darwin' : moz_name = `firefox`; break;
+    case 'linux' : moz_name = `firefox`; break;
+    default: break;
+}
+
+isRunning(moz_name, (status) => {
+	if (!status) {
+		startUp();
+		runMasterPass();
 	} else {
-		$("#instagramDetected").replaceWith('<span class="uk-text-danger"><span class="uk-margin-small-right" uk-icon="close"></span> Aucun login detecté</span>');
-		$('#insta').attr('disabled','disabled');
-		$( "#optionButonInsta" ).remove();
-		$( "#optionMenuInsta" ).remove();
-		}	
-		if (store.get('instaSessions')) {
-			$("#instaInjectButton").show();
-			$("#insta").hide();			
-		}
+		smallPb();
+	}
+})
 
-});
-
-let twitterExist = `SELECT baseDomain FROM moz_cookies WHERE baseDomain='twitter.com' AND name = 'auth_token';`;
-db.all(twitterExist, [], (err, rows) => {
-
-	if (err) {
-		throw err;
-	}  
-	if (rows != '') {
-		$("#twitterDetected").replaceWith('<span class="uk-text-success"><span class="uk-margin-small-right" uk-icon="check"></span> Twitter login detecté</span>');
-	} else {
-		$("#twitterDetected").replaceWith('<span class="uk-text-danger"><span class="uk-margin-small-right" uk-icon="close"></span> Aucun login detecté</span>');
-		$('#twitter').attr('disabled','disabled');
-		$( "#optionButonTwitter" ).remove();
-		$( "#optionMenuTwitter" ).remove();
-		}
-		if (store.get('twitterSessions')) {
-			$("#twitterInjectButton").show();
-			$("#twitter").hide();			
-		}
-});
-
-let githubExist = `SELECT baseDomain FROM moz_cookies WHERE baseDomain='github.com' AND name = 'user_session';`;
-db.all(githubExist, [], (err, rows) => {
-
-	if (err) {
-		throw err;
-	}  
-	if (rows != '') {
-		$("#githubDetected").replaceWith('<span class="uk-text-success"><span class="uk-margin-small-right" uk-icon="check"></span> Github login detecté</span>');
-	} else {	
-		$("#githubDetected").replaceWith('<span class="uk-text-danger"><span class="uk-margin-small-right" uk-icon="close"></span> Aucun login detecté</span>');
-		$('#github').attr('disabled','disabled');
-		$( "#optionButonGithub" ).remove();
-		$( "#optionMenuGithub" ).remove();
-		}
-		if (store.get('githubSessions')) {
-			$("#githubInjectButton").show();
-			$("#github").hide();			
-		}
-
-});
 

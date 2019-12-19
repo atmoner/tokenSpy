@@ -16,7 +16,7 @@
 
     <body>
 <br />
-<div class="uk-container">
+<div class="uk-container" id="all">
 <div align="center"><img src="logo.png" width="60" height="60"> </div> <br />
 <div class="uk-child-width-expand@s " uk-grid>
     <div>
@@ -25,18 +25,7 @@
 		 <button class="uk-button uk-button-primary" id="insta"> <span class="uk-margin-small-right" uk-icon="instagram"></span> Dump</button> 
 		<div id="instaInjectButton" style="display: none;">
 			<button class="uk-button uk-button-primary" id="instaInject"> 
-				<span class="uk-margin-small-right" uk-icon="instagram"></span> Inject login</button>
-			<button id="optionButonInsta" class="uk-button uk-button-default" type="button"><span class="uk-margin-small-right" uk-icon="more-vertical"></span></button>
-			<div id="optionMenuInsta" uk-dropdown>
-				<ul class="uk-nav uk-dropdown-nav">
-				    <li class="uk-nav-header">Token options</li>
-				    <li><a href="#">Voir le token</a></li>
-				    <li><a href="#">Editer le token</a></li>
-				    <li class="uk-nav-divider"></li>
-				    <li><a href="#">Effacer le token</a></li>
-				</ul>
-			</div>  
-		</div>
+				<span class="uk-margin-small-right" uk-icon="instagram"></span> Inject login</button> </div>
 		<!-- <div id="instaDump"></div> -->
  
 
@@ -47,20 +36,10 @@
         <div class="uk-card uk-card-default uk-card-body">
 		<div id="twitterDetected"></div><br /><br />
 		<button class="uk-button uk-button-primary" id="twitter"> <span class="uk-margin-small-right" uk-icon="twitter"></span> Dump</button> 
-		<div id="twitterInjectButton" style="display: none;">
+ <div id="twitterInjectButton" style="display: none;">
 			<button class="uk-button uk-button-primary" id="twitterInject"> 
-				<span class="uk-margin-small-right" uk-icon="twitter"></span> Inject login</button>
-			<button id="optionButonTwitter" class="uk-button uk-button-default" type="button"><span class="uk-margin-small-right" uk-icon="more-vertical"></span></button>
-			<div id="optionMenuTwitter" uk-dropdown>
-				<ul class="uk-nav uk-dropdown-nav">
-				    <li class="uk-nav-header">Token options</li>
-				    <li><a href="#">Voir le token</a></li>
-				    <li><a href="#">Editer le token</a></li>
-				    <li class="uk-nav-divider"></li>
-				    <li><a href="#">Effacer le token</a></li>
-				</ul>
-			</div>
-		</div>
+				<span class="uk-margin-small-right" uk-icon="twitter"></span> Inject login</button></div>
+<div id="twitterSucces" style="display: none;"><span class="uk-text-success"> Inject session OK!</span></div>
 		<!-- <div id="twitterDump"></div>	 -->
 
 		</div>
@@ -72,23 +51,12 @@
 		 <button class="uk-button uk-button-primary" id="github"> <span class="uk-margin-small-right" uk-icon="github"></span> Dump</button> 
 		<div id="githubInjectButton" style="display: none;">
 			<button class="uk-button uk-button-primary" id="githubInject"> 
-				<span class="uk-margin-small-right" uk-icon="github"></span> Inject login</button>
-			<button id="optionButonGithub" class="uk-button uk-button-default" type="button"><span class="uk-margin-small-right" uk-icon="more-vertical"></span></button>
-			<div id="optionMenuGithub" uk-dropdown>
-				<ul class="uk-nav uk-dropdown-nav">
-				    <li class="uk-nav-header">Token options</li>
-				    <li><a href="#">Voir le token</a></li>
-				    <li><a href="#">Editer le token</a></li>
-				    <li class="uk-nav-divider"></li>
-				    <li><a href="#">Effacer le token</a></li>
-				</ul>
-			</div>
-		</div>
+				<span class="uk-margin-small-right" uk-icon="github"></span> Inject login</button> </div>
 		<!-- <div id="githubDump"></div> -->			
 		</div>
  
     </div>
-
+<!-- 
     <div>
         <div class="uk-card uk-card-default uk-card-body">
 		  <div id="deleteReturn"></div>
@@ -105,11 +73,11 @@
 </div>
 		  <div id="returnDebug"></div><br /><br />
 		 <button class="uk-button uk-button-primary" id="displayDebug">Afficher le debug()</button>			
-</div>
+</div> -->
     <!-- <div id="container"></div> -->
 
 
-<div id="modal-group-1" uk-modal>
+<div id="masterPass" uk-modal>
     <div class="uk-modal-dialog">
  
         <div class="uk-modal-header">
@@ -132,6 +100,21 @@
         </div>
     </div>
 </div>
+<div id="errorMoz" uk-modal>
+    <div class="uk-modal-dialog">
+ 
+        <div class="uk-modal-header">
+            <h2 class="uk-modal-title"><img src="logo.png" width="30" height="30"> Error!</h2>
+        </div>
+        <div class="uk-modal-body">
+            
+			<p>Error! Mozilla already running, please close it for use tokenSpy </p>
+			
+        </div>
+ 
+    </div>
+</div>
+
      <script src="./renderer.js"> </script>
     </body>
 </html>
